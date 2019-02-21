@@ -8,15 +8,17 @@ using namespace std;
 int main()
 {
 	string file;
-	char values;
+	string values;
 	fstream inFile;
+	char temp;
 	cout << "what file do you want to open" << endl;
 	cin >> file;
 	inFile.open(file.c_str(), ios:: in | ios::out);
 
-	while (inFile >> values)
+	while (inFile >> temp >> noskipws)
 	{
-		cout << values << endl;
+		cout << temp << endl;
+		
 	}
 	//cin.get();
 	system("pause");
