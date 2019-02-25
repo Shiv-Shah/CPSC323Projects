@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include "lexer.h"
+#include "FSM.h"
 
 
 using namespace std; 
@@ -21,7 +22,7 @@ void lexer:: readFile(string file)
 }
 
 
-
+//The code below should be FSM.run()
 void lexer::finiteStateMachine(int state, char a)
 {
 
