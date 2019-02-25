@@ -47,7 +47,7 @@ void FSM::run(char input) {
 
 }
 
-void FSM::run(char input) {
+void FSM::run(char input, string file) {
 	//runs this FSM on the specified 'input' string
 	//returns 'true' if 'input' or a subset of 'input' matches
 	//the regular experession corresponding to this FSM
@@ -56,7 +56,7 @@ void FSM::run(char input) {
 
 	for (int i = 0; i < input.length(); i++) {
 		//Code to get a character
-		readFile()
+		readFile(file);
 	}
 
 
