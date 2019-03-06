@@ -18,6 +18,8 @@ string keywords[20] = {
 	"for", "and", "or" , "function"//More keywords
 };
 
+vector <pair<string, string>> showTokenLexeme;
+
 
 lexer::lexer() {
 	

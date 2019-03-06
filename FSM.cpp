@@ -13,7 +13,6 @@ int FSMtable[6][7] = {
 	{ 0, 0, 0, 0, 0, 0, 0 }
 };
 
-
 FSM::FSM() {
 	//contructor
 
@@ -79,7 +78,6 @@ int FSM::findState(char temp, int state) {//continue to use a character
 	}
 	
 }
-
 // ----------Modifying StateTransition () to better reflect your main -------------- Sami
 // Best solution is to pass tempString,currentState and char by reference to be able to modify the vaule in main and display
 // 		if neccesary
@@ -88,19 +86,20 @@ int FSM::findState(char temp, int state) {//continue to use a character
 void FSM::stateTransition(int &currentState,  char &temp, string &tempString, string fileString, int i) {
 	lexer lexerObject;
 
+	temp = fileString[i];
 	if (currentState != 4) {
-		temp = fileString[i];
+		
 		currentState = findState(temp , currentState);// Changed ch (char type) to temp (char type) like in 
-															//the prototype -- Sami
+															
 		switch (currentState) {
 		case 0: // Displays Lexem if valid input
-			lexerObject.testLexeme(tempString); // Modified to match Parameters-Sami
+			lexerObject.testLexeme(tempString); 
 		//	LexerObject.testLexeme(temp);
-			lexerObject.sepOrOp(temp);			//Modified to match parameters -Sami
+			lexerObject.sepOrOp(temp);			
 		// 	lexerObject.sepOrOp(ch);
 			tempString = "";
 			break;
-		case 1: // continue to read for strings (KeyWords, Identifiers, etc) - Sami
+		case 1: 
 			tempString += temp;
 			//temp += ch;
 			break;
@@ -114,25 +113,16 @@ void FSM::stateTransition(int &currentState,  char &temp, string &tempString, st
 			break;
 		case 4: // Displays Lexeme if '!' is detected
 			lexerObject.testLexeme(tempString);
-			tempString = ""; 					// Modfied to match Parameters - Sami
+			tempString = ""; 					
 		//	temp = "";
 			break;
-		case 5: // Displays lexemes if state transitions to invalid (Same as case 0) - Sami
-			lexerObject.testLexeme(tempString); // Modified to match parameters - Sami
+		case 5: 
+			lexerObject.testLexeme(tempString); 
 		//	LexerObject.testLexeme(temp);
-			lexerObject.sepOrOp(temp);			// Modified to match parameters - Sami
+			lexerObject.sepOrOp(temp);			
 		// 	lexerObject.sepOrOp(ch);	
 			tempString = "";
 			//temp = "";
-			break;
-		case 6:
-			if (temp == ' ' || temp == '(' || temp == ')' || temp == '{' || temp == '}' || temp == '+' || temp == '-' || temp == '*' || temp == '/' || temp == ',' || temp == ' : ')
-			{
-				lexerObject.testLexeme(tempString);
-				tempString = "";
-			}
-			//add a new case that checks if we're at a delimeter, takes the string, then checks if it's keyword
-			//or identifier, pushes it into the vector, then deletes tempString
 			break;
 		}
 		
@@ -142,7 +132,6 @@ void FSM::stateTransition(int &currentState,  char &temp, string &tempString, st
 	}
 
 	//lexerObject.testLexeme(tempString);
-	//tempString = ""; 					// Modfied to match Parameters - Sami
+	//tempString = ""; 					
 //	temp = "";
 }
-//------------------------------------------------ Finish Modifcations -- Sami

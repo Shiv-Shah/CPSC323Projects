@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 #include <typeinfo>
-// Added headers to access required functions - Sami
+
 //----------------------------------------- 
 #include "FSM.h"
 #include "lexer.h"
@@ -22,7 +22,7 @@ int main() {
 	//unsigned char temp;
 	char temp;
 	//---------------------------
-	string tempString = ""; //Added Variable to hold onto temp string -  Sami
+	string tempString = ""; 
 	//----------------------------
 		string fileString = "";
 	//initialize currentState as 0 to start
@@ -48,7 +48,7 @@ int main() {
 	cout << "Num of char in file is: " << fileString.length();
 	inFile.close();
 
-	//---------------------------Beginning of Modified Main------------ Sami
+
 
 	for (unsigned int i = continueHere; i < fileString.size(); i++)
 	{
@@ -59,10 +59,10 @@ int main() {
 	}
 	//------------------------------------------------------------------
 
-	lexer token; 
-	for (unsigned int i = 0; i < token.showTokenLexeme.size(); i++)
+	//lexer token; 
+	for (unsigned int i = 0; i < showTokenLexeme.size(); i++)
 	{
-		cout << token.showTokenLexeme[i].first <<  " " << token.showTokenLexeme[i].second << endl;
+		cout << showTokenLexeme[i].first <<  " " << showTokenLexeme[i].second << endl;
 	}
 
 	cout << endl;
