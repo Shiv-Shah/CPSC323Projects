@@ -1,21 +1,21 @@
 #pragma once
-#include <iostream>
-#include<iomanip>
-#include <string>
-#include<fstream>
-#include <vector>
+#include<string>
+#include<vector>
+
+using namespace  std;
 
 
-using namespace std;
-class lexer
-{
+extern char operators[21];
+extern string keywords[20];
+
+class lexer {
 public:
-	void readFile(std::string file);
-	void finiteStateMachine(int state, char a);
 
+	lexer();
+	void testLexeme(string temp);
+	void sepOrOp(char ch);
+	vector <pair<string, string>> showTokenLexeme;
+	//Might need to delete the declarations below
+	
 
-
-
-private:
-	vector<vector<int>> fsm;
 };

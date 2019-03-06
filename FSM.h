@@ -1,23 +1,13 @@
 #pragma once
-#include <string>
-#include "lexer.h"
-using namespace std;
+#include<string>
 
-class FSM
-{
+using namespace  std;
+extern int FSMtable[6][7];
+class FSM {
 public:
 	FSM();//constructor
-	FSM(int states, int initialState, int acceptingStates, int nextState);//overloaded constructor
-	enum class states;
-	void run(char input);
-	int nextState(string currentState, string input);
-	~FSM();//destructor
+	int findState(char temp, int state);
 
-private:
-	int states;
-	int initialState;
-	int acceptingStates;
-	int nextStates;
+	void stateTransition(int &currentState,  char &temp, string &tempString, string fileString, int i);
+
 };
-
-

@@ -1,67 +1,148 @@
-#include "FSM.h"
+#include <iostream>
 #include <string>
+#include <cctype>
+#include "FSM.h"
 #include "lexer.h"
 
-using namespace std;
-
-
-
-FSM::FSM()
-{
-}
-
-
-enum class FSM::states {
-	STR, INT, FLOAT, COM, NEW, INVALID
+int FSMtable[6][7] = {
+	{ 1, 2, 4, 0, 0, 0, 0 },
+	{ 1, 1, 4, 0, 0, 0, 0 },
+	{ 5, 2, 4, 0, 3, 0, 0 },
+	{ 5, 3, 4, 0, 5, 0, 0 },
+	{ 4, 4, 0, 4, 4, 4, 4 },
+	{ 0, 0, 0, 0, 0, 0, 0 }
 };
 
-FSM::FSM(int states, int initialState, int acceptingStates, int nextState) {
 
+FSM::FSM() {
+	//contructor
 
 }
 
-int nextState(char currentState, char input) {
-	//I believe that each return will be an enumeration
-	switch (currentState) {
-	case 1:
-		if (input == 'a' || input == 'b') {
-		return 1;
+/*------------------Sammi's state trans table----------------------
+---------------------Credit Given (Period 1)-----------------------
+This Function is designed to navigate through the State Transition table.
+Given the specific character being currently read from the file, the state will
+change according to the table. Table is initialized in global scope but can be
+referenced as such:
+char num  '!' sep '.' ops  '\n'
+new(0)			1,	2,	4,	0,	0,	0,  0
+string(1)		1,	1,	4,	0,	0,	0,  0
+int(2)			5,	2,	4,	0,	3,	0,  0
+float(3)		5,	3,	4,	0,	5,	0,  0
+comment(4)	4,	4,	0,	4,	4,	4,  4
+invalid(5)	0,	0,	0,	0,	0,	0   0
+*/
+
+int FSM::findState(char temp, int state) {//continue to use a character
+	lexer lexerObject;
+	int currentState = state;
+	if (isalpha(temp)) {//if temp is alphabetic
+		currentState = FSMtable[currentState][0];
+		return currentState;
+	}
+	else if (isdigit(temp) || temp == '$') {
+		//if it's a number or dollar sign
+		currentState = FSMtable[currentState][1];
+		return currentState;
+	}
+	else if (temp == operators[19]) {
+		//[20] == '!'
+		currentState = FSMtable[currentState][2];
+		return currentState;
+	}
+	else if (temp == operators[15]) {
+		//[16] == '.'
+		currentState = FSMtable[currentState][4];
+		return currentState;
+	}
+	else if (temp == operators[20]) {
+		//[21] == ' '
+		currentState = FSMtable[currentState][6];
+		return currentState; 
+	}
+	else {
+
+		for (int i = 0; i < 8; i++) {
+			if (temp == operators[i] || isspace(temp)) {
+				currentState = FSMtable[currentState][5];
+				return currentState;
+			}
 		}
-		break;
 
-	case 2:
-		if (input == 'c') {
-			return 3;
+		for (int i = 8; i < 22; i++) {
+			if (temp == operators[i] || isspace(temp)) {
+				currentState = FSMtable[currentState][3];
+				return currentState;
+			}
 		}
-		break;
-
-	default:
-		break;
-}
-
-return NoNextState;//constant to specify that there is no next state
+	}
 	
 }
 
-void FSM::run(char input) {
+// ----------Modifying StateTransition () to better reflect your main -------------- Sami
+// Best solution is to pass tempString,currentState and char by reference to be able to modify the vaule in main and display
+// 		if neccesary
+// Also adding in fileString to be able to test string immediately 
+// added int i to get current location of file string.
+void FSM::stateTransition(int &currentState,  char &temp, string &tempString, string fileString, int i) {
+	lexer lexerObject;
 
-}
-
-void FSM::run(char input, string file) {
-	//runs this FSM on the specified 'input' string
-	//returns 'true' if 'input' or a subset of 'input' matches
-	//the regular experession corresponding to this FSM
-
-	int currentState = initialState;
-
-	for (int i = 0; i < input.length(); i++) {
-		//Code to get a character
-		readFile(file);
+	if (currentState != 4) {
+		temp = fileString[i];
+		currentState = findState(temp , currentState);// Changed ch (char type) to temp (char type) like in 
+															//the prototype -- Sami
+		switch (currentState) {
+		case 0: // Displays Lexem if valid input
+			lexerObject.testLexeme(tempString); // Modified to match Parameters-Sami
+		//	LexerObject.testLexeme(temp);
+			lexerObject.sepOrOp(temp);			//Modified to match parameters -Sami
+		// 	lexerObject.sepOrOp(ch);
+			tempString = "";
+			break;
+		case 1: // continue to read for strings (KeyWords, Identifiers, etc) - Sami
+			tempString += temp;
+			//temp += ch;
+			break;
+		case 2: // continue to read for ints
+			tempString += temp;
+			//	temp += ch;
+			break;
+		case 3: // Continue to read for float
+			tempString += temp;
+			//	temp += ch;
+			break;
+		case 4: // Displays Lexeme if '!' is detected
+			lexerObject.testLexeme(tempString);
+			tempString = ""; 					// Modfied to match Parameters - Sami
+		//	temp = "";
+			break;
+		case 5: // Displays lexemes if state transitions to invalid (Same as case 0) - Sami
+			lexerObject.testLexeme(tempString); // Modified to match parameters - Sami
+		//	LexerObject.testLexeme(temp);
+			lexerObject.sepOrOp(temp);			// Modified to match parameters - Sami
+		// 	lexerObject.sepOrOp(ch);	
+			tempString = "";
+			//temp = "";
+			break;
+		case 6:
+			if (temp == ' ' || temp == '(' || temp == ')' || temp == '{' || temp == '}' || temp == '+' || temp == '-' || temp == '*' || temp == '/' || temp == ',' || temp == ' : ')
+			{
+				lexerObject.testLexeme(tempString);
+				tempString = "";
+			}
+			//add a new case that checks if we're at a delimeter, takes the string, then checks if it's keyword
+			//or identifier, pushes it into the vector, then deletes tempString
+			break;
+		}
+		
+	}
+	else if (temp == '!' && currentState == 4) {
+		currentState = FSMtable[currentState][2];
 	}
 
-
+	//lexerObject.testLexeme(tempString);
+	//tempString = ""; 					// Modfied to match Parameters - Sami
+//	temp = "";
 }
-
-FSM::~FSM()
-{
-}
+//------------------------------------------------ Finish Modifcations -- Sami
