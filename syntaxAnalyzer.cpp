@@ -26,13 +26,23 @@ syntaxAnalyzer::syntaxAnalyzer()
 	//Production rules:
 
 	/*
-	i			+		-		*		/		(		)		$
+		  i			+		-		*		/		(		)		$
 	S	i = E
 	E	 TQ											TQ
 	Q			  +TQ	  -TQ								e		e
-	T	FR											FR
+	T	 FR											FR
 	R				e		e	  *FR	  /FR				e		e
 	F	 i											(E)
+	*/
+
+	/*
+	S = Statement
+	E = Expresseion
+	Q = Expression Prime
+	T = Term
+	R = Term Prime
+	F = Factor
+	i = Identifier
 	*/
 }
 	
@@ -43,7 +53,7 @@ void syntaxAnalyzer::useSyntax() {
 	vector <pair<symbols, string>> showSymbolLexeme;//make new vector with enum symbols
 	showSymbolLexeme.push_back(pair<symbols, string>(DOLLAR_SIGN, "$")); //Put a '$' at the end of the vector that's storing the string 
 	for (int i = 0; i < showTokenLexeme.size(); i++) {
-		if (showTokenLexeme[i].first == "Identifier") {
+		if (showTokenLexeme[i].first == "Identifier: \t") {
 			showSymbolLexeme.push_back(pair<symbols, string>(IDENTIFIER, showTokenLexeme[i].second));
 		}
 		else if (showTokenLexeme[i].second == "+") {
@@ -99,37 +109,58 @@ void syntaxAnalyzer::useSyntax() {
 	symbolsStack.push(DOLLAR_SIGN);
 	symbolsStack.push(S);
 
-	while (symbolsStack.size() > 0) {//need a pointer system, or like make each command that doesn't call the lexer do i++ so it doesn't go to the next one
-		for (int i = 0; i < showTokenLexeme.size(); i++) {
-			/*IDENTIFIER, PLUS, MINUS,
-				ASTERISK, BACKSLASH, RIGHT_PARENS,
-				LEFT_PARENS, DOLLAR_SIGN, EQUAL_SIGN,
-				EPSILON*/
-			//if (symbolsStack.top() == showSymbolLexeme[i].first) {//if what's on top of the stack is the same as what's in our current location of the string
-			// and it's a non terminal
-			if((showSymbolLexeme[i].first == IDENTIFIER || showSymbolLexeme[i].first == PLUS || showSymbolLexeme[i].first == MINUS
-				|| showSymbolLexeme[i].first == MINUS || showSymbolLexeme[i].first == ASTERISK || showSymbolLexeme[i].first == BACKSLASH
-				|| showSymbolLexeme[i].first == RIGHT_PARENS || showSymbolLexeme[i].first == LEFT_PARENS || showSymbolLexeme[i].first == DOLLAR_SIGN
-				|| showSymbolLexeme[i].first == EQUAL_SIGN || showSymbolLexeme[i].first == EPSILON) && symbolsStack.top() == showSymbolLexeme[i].first) {
-				cout << "Matched symbols: " << showSymbolLexeme[i].first << endl;
+	string tokenString = "";
+	while (symbolsStack.size() > 0) {
+		for (int i = 0; i < showSymbolLexeme.size(); i++) {
+			for (int j = 0; j < sizeof(symbols); j++) {
+				if (showSymbolLexeme[i].first == IDENTIFIER) {
+					tokenString = "identifier";
+				}
+				else if (showSymbolLexeme[i].first == PLUS || showSymbolLexeme[i].first == MINUS ||
+					showSymbolLexeme[i].first == ASTERISK || showSymbolLexeme[i].first == BACKSLASH
+					|| showSymbolLexeme[i].first == DOLLAR_SIGN || showSymbolLexeme[i].first == EQUAL_SIGN) {
+					tokenString = "Operator";
+				}
+				else if (showSymbolLexeme[i].first == RIGHT_PARENS || showSymbolLexeme[i].first == LEFT_PARENS) {
+					tokenString = "SEPERATOR";
+				}
+				else if (showSymbolLexeme[i].first == EPSILON) {
+					tokenString = "e";
+				}
+				else {
+					tokenString = "invalid Syntax";
+				}
+
+			}
+			if (symbolsStack.top() == showSymbolLexeme[i].first) {
+				cout << "Token: " << tokenString << "\t ";
+				cout << "Lexeme: " << showSymbolLexeme[i].second << endl;
 				symbolsStack.pop();//Allow the loop to increment now
+			}
+			else if (symbolsStack.top() == EQUAL_SIGN) {
+				cout << "Token: " << tokenString << "\t ";
+				cout << "Lexeme: " << showSymbolLexeme[i].second << endl;
+				symbolsStack.pop();
 			}
 			else {
 				cout << "Rule " << table[symbolsStack.top()][showSymbolLexeme[i].first] << endl;
+
 				switch (table[symbolsStack.top()][showSymbolLexeme[i].first]) {
 				case 1: //S -> i = E
 					symbolsStack.pop();
 					symbolsStack.push(E);          //E
 					symbolsStack.push(EQUAL_SIGN);// =
 					symbolsStack.push(IDENTIFIER);// i
-					i++;//Don't move onto the next element, only for lexer()
+					cout << "<Statement> -> <identifier> = <Expression>" << endl;//Don't move onto the next element, only for lexer()
+					i--;
 					break;
 
 				case 2://E -> TQ
-					symbolsStack.pop(); 
+					symbolsStack.pop();
 					symbolsStack.push(Q);//Q
 					symbolsStack.push(T);//T
-					i++;
+					cout << "<Expression> -> <Term><Expression Prime>" << endl;
+					i--;
 					break;
 
 				case 3://Q -> +TQ
@@ -137,7 +168,8 @@ void syntaxAnalyzer::useSyntax() {
 					symbolsStack.push(Q);//Q
 					symbolsStack.push(T);  //T
 					symbolsStack.push(PLUS);  //+
-					i++;
+					cout << "<Expression Prime> -> +<Term><Expression Prime>" << endl;
+					i--;
 					break;
 
 				case 4://Q -> -TQ
@@ -145,23 +177,26 @@ void syntaxAnalyzer::useSyntax() {
 					symbolsStack.push(Q);	 //Q
 					symbolsStack.push(T);	 //T
 					symbolsStack.push(MINUS);//-
-					i++;
+					cout << "<Expression Prime> -> -<Term><Expression Prime>" << endl;
+					i--;
 					break;
 
 				case 5://Q -> e
-					//With ( or $
-					//R -> e
-					//with + or -
+					   //With ( or $
+					   //R -> e
+					   //with + or -
 					symbolsStack.pop();
-					symbolsStack.push(EPSILON);//e
-					i++;
+					//symbolsStack.push(EPSILON);//e
+					cout << "<Expression Prime> or <Term Prime> -> <ε>" << endl;
+					i--;
 					break;
 
 				case 6://T -> FR
 					symbolsStack.pop();
 					symbolsStack.push(R);//R
 					symbolsStack.push(F);//F
-					i++;
+					cout << "<Term> -> <Factor><Term Prime>" << endl;
+					i--;
 					break;
 
 				case 7:// R -> FR
@@ -169,13 +204,15 @@ void syntaxAnalyzer::useSyntax() {
 					symbolsStack.pop();
 					symbolsStack.push(R);//R
 					symbolsStack.push(F);//F
-					i++;
+					cout << "<Term Prime> -> <Factor><Term Prime>" << endl;
+					i--;
 					break;
 
 				case 8:// F -> i
 					symbolsStack.pop();
 					symbolsStack.push(IDENTIFIER);//i
-					i++;
+					cout << "<Factor> -> <identifier>" << endl;
+					i--;
 					break;
 
 				case 9://F -> (E)
@@ -183,25 +220,20 @@ void syntaxAnalyzer::useSyntax() {
 					symbolsStack.push(RIGHT_PARENS);// )
 					symbolsStack.push(E);//            E
 					symbolsStack.push(LEFT_PARENS);//  )
-					i++;
+					cout << "<Factor> -> (Expression)" << endl;
+					i--;
 					break;
 
 				default:
 					cout << "parsing table defaulted" << endl;
 					//return 0;
 					break;
-
 				}
 			}
+			cout << endl;
 		}
-		
-
 	}
-
 }
-
-
-
 
 syntaxAnalyzer::~syntaxAnalyzer()
 {
